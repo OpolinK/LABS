@@ -1,0 +1,18 @@
+import sys
+import math
+
+import sys
+
+# Зчитуємо вхідні повідомлення
+message_1 = bytes.fromhex(input().strip())
+message_2 = bytes.fromhex(input().strip())
+message_3 = bytes.fromhex(input().strip())
+
+# Обчислюємо AliceKey
+alice_key = bytes(m2 ^ m3 for m2, m3 in zip(message_2, message_3))
+
+# Обчислюємо початкове повідомлення
+clear_message = bytes(m1 ^ ak for m1, ak in zip(message_1, alice_key))
+
+# Декодуємо у текст
+print(clear_message.decode('ascii'))
