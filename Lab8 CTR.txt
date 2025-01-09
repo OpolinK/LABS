@@ -1,0 +1,44 @@
+# Потрібно додатково встановити pycryptodome: pip install pycryptodome
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+
+# Функція для шифрування даних в режимі CTR
+def aes_encrypt_ctr(key, plaintext):
+    # Створення об'єкта шифру з режимом CTR
+    cipher = AES.new(key, AES.MODE_CTR)
+    
+    # Шифрування
+    ciphertext = cipher.encrypt(plaintext)
+    
+    return cipher.nonce + ciphertext
+
+# Функція для розшифрування даних в режимі CTR
+def aes_decrypt_ctr(key, ciphertext):
+    # Розділення nonce та зашифрованого тексту
+    nonce = ciphertext[:8]  # Виправлення довжини nonce для режиму CTR
+    ciphertext_body = ciphertext[8:]
+
+    # Створення об'єкта шифру з режимом CTR
+    cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)
+
+    # Розшифрування
+    plaintext = cipher.decrypt(ciphertext_body)
+    
+    return plaintext
+
+# Приклад використання
+if __name__ == "__main__":
+    # Генерація ключа AES (16, 24 або 32 байти для AES-128, AES-192, AES-256 відповідно)
+    key = get_random_bytes(16)
+
+    # Вхідний текст для шифрування
+    plaintext = b"Hello, this is a secret message!"
+
+    # Шифрування
+    ciphertext = aes_encrypt_ctr(key, plaintext)
+    print("Ciphertext:", ciphertext.hex())
+
+    # Розшифрування
+    decrypted_text = aes_decrypt_ctr(key, ciphertext)
+    print("Decrypted Text:", decrypted_text.decode('utf-8'))

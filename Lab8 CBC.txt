@@ -1,0 +1,53 @@
+# Потрібно додатково встановити pycryptodome: pip install pycryptodome
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+
+# Функція для шифрування даних в режимі CBC
+def aes_encrypt_cbc(key, plaintext):
+    # Генерація випадкового вектора ініціалізації (IV)
+    iv = get_random_bytes(16)
+    
+    # Створення об'єкта шифру
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    
+    # Вирівнювання тексту до блочного розміру
+    padded_plaintext = pad(plaintext, AES.block_size)
+    
+    # Шифрування
+    ciphertext = cipher.encrypt(padded_plaintext)
+    
+    return iv + ciphertext
+
+# Функція для розшифрування даних в режимі CBC
+def aes_decrypt_cbc(key, ciphertext):
+    # Розділення IV та зашифрованого тексту
+    iv = ciphertext[:16]
+    ciphertext_body = ciphertext[16:]
+
+    # Створення об'єкта шифру
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Розшифрування
+    padded_plaintext = cipher.decrypt(ciphertext_body)
+
+    # Видалення вирівнювання
+    plaintext = unpad(padded_plaintext, AES.block_size)
+    
+    return plaintext
+
+# Приклад використання
+if __name__ == "__main__":
+    # Генерація ключа AES (16, 24 або 32 байти для AES-128, AES-192, AES-256 відповідно)
+    key = get_random_bytes(16)
+
+    # Вхідний текст для шифрування
+    plaintext = b"Hello, this is a secret message!"
+
+    # Шифрування
+    ciphertext = aes_encrypt_cbc(key, plaintext)
+    print("Ciphertext:", ciphertext.hex())
+
+    # Розшифрування
+    decrypted_text = aes_decrypt_cbc(key, ciphertext)
+    print("Decrypted Text:", decrypted_text.decode('utf-8'))
